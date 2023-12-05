@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	pb "https://github.com/epsilondylan/distributedOS"
+	pb "github.com/epsilondylan/distributedOS"
 )
 
 type server struct {
