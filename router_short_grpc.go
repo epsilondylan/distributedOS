@@ -1,4 +1,4 @@
-package pheromones
+package main
 
 import (
 	"context"
@@ -126,9 +126,29 @@ func (s *server) getPeer(name string) (*pb.Keyvalue, error) {
 }
 
 func (s *server) dispatch(addr, msg string) (string, error) {
-	// Implement the actual logic for dispatching here
-	// This is a placeholder, and you need to replace it with your logic
-	return fmt.Sprintf("Dispatched to %s: %s", addr, msg), nil
+	// Create a gRPC connection to the remote server
+	conn, err := grpc.Dial(addr, grpc.WithInsecure())
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+
+	// Create a gRPC client
+	client := pb.NewPheromonesClient(conn)
+
+	// Call the Dispatch RPC on the remote server
+	dispatchResponse, err := client.Dispatch(context.Background(), &pb.DispatchRequest{
+		Name: addr, // Assuming addr is the name for simplicity, replace it with the actual name
+		Message: &pb.Message{
+			Content: msg,
+		},
+	})
+	if err != nil {
+		return "", err
+	}
+
+	// Return the content from the response
+	return dispatchResponse.Content, nil
 }
 
 func main() {
